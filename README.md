@@ -1,11 +1,11 @@
-# Frolaxify 内存取证工具
+# Frolaxity 内存取证工具
 
 
 
 
 ## 项目简介
 
-Frolaxify 一个基于Volatility的CTF内存取证自动化工具  文件提取、进程提取无多线程提取 默认common_address=True
+Frolaxity 一个基于Volatility的CTF内存取证自动化工具  文件提取、进程提取无多线程提取 默认common_address=True
 
 Volatility 插件配置在 volplugins.py  正则配置在 Folpattern.py   默认注释vol2文件提取、vol3进程提取代码
 
@@ -64,28 +64,28 @@ options:
 
 ```bash
 使用示例:
-  Frolaxify.py -f memory.img                自动分析
-  Frolaxify.py -f memory.img -R             提取隐藏进程
-  Frolaxify.py -f memory.img -O             提取常用地址
-  Frolaxify.py -f memory.img -S             仅执行插件命令
-  Frolaxify.py -f memory.img -U             仅进程提取扫描
-  Frolaxify.py -f memory.img -S             仅文件提取扫描
-  Frolaxify.py -f memory.img -cp            提取常用进程
-  Frolaxify.py -f memory.img -cd            提取常用地址
-  Frolaxify.py -f memory.img -S -V          仅执行插件命令
-  Frolaxify.py -f memory.img -U -V          仅进程提取扫描
-  Frolaxify.py -f memory.img -S -V          仅文件提取扫描
-  Frolaxify.py -f memory.img -cp -V         提取常用进程
-  Frolaxify.py -f memory.img -cd -V         提取常用地址
-  Frolaxify.py -f memory.img -pr 镜像       指定内存镜像
-  Frolaxify.py -f memory.img -g			   默认正则扫描
-  Frolaxify.py -f memory.img -g -D 目录     扫描指定目录
-  Frolaxify.py -f memory.img -Y             YARA规则扫描
-  Frolaxify.py -f memory.img -p 1234 -pl    分析进程PoolTag
-  Frolaxify.py -f memory.img -L             文件系统压缩包
-  Frolaxify.py -f memory.img -p 1234        提取进程内存
-  Frolaxify.py -f memory.img -Q 0x123456    提取指定文件
-  Frolaxify.py -f memory.img -V             使用vol3版本
+  Frolaxity.py -f memory.img                自动分析
+  Frolaxity.py -f memory.img -R             提取隐藏进程
+  Frolaxity.py -f memory.img -O             提取常用地址
+  Frolaxity.py -f memory.img -S             仅执行插件命令
+  Frolaxity.py -f memory.img -U             仅进程提取扫描
+  Frolaxity.py -f memory.img -S             仅文件提取扫描
+  Frolaxity.py -f memory.img -cp            提取常用进程
+  Frolaxity.py -f memory.img -cd            提取常用地址
+  Frolaxity.py -f memory.img -S -V          仅执行插件命令
+  Frolaxity.py -f memory.img -U -V          仅进程提取扫描
+  Frolaxity.py -f memory.img -S -V          仅文件提取扫描
+  Frolaxity.py -f memory.img -cp -V         提取常用进程
+  Frolaxity.py -f memory.img -cd -V         提取常用地址
+  Frolaxity.py -f memory.img -pr 镜像       指定内存镜像
+  Frolaxity.py -f memory.img -g			   默认正则扫描
+  Frolaxity.py -f memory.img -g -D 目录     扫描指定目录
+  Frolaxity.py -f memory.img -Y             YARA规则扫描
+  Frolaxity.py -f memory.img -p 1234 -pl    分析进程PoolTag
+  Frolaxity.py -f memory.img -L             文件系统压缩包
+  Frolaxity.py -f memory.img -p 1234        提取进程内存
+  Frolaxity.py -f memory.img -Q 0x123456    提取指定文件
+  Frolaxity.py -f memory.img -V             使用vol3版本
 ```
 
 
@@ -153,3 +153,4 @@ def _set_python_paths(self):
 ## 许可证
 
 MIT License
+
