@@ -64,25 +64,24 @@ options:
 
 ```bash
 使用示例:
-  Frolaxity.py -f memory.img                自动分析
-  Frolaxity.py -f memory.img -R             提取隐藏进程
-  Frolaxity.py -f memory.img -O             提取常用地址
-  Frolaxity.py -f memory.img -S             仅执行插件命令
-  Frolaxity.py -f memory.img -U             仅进程提取扫描
-  Frolaxity.py -f memory.img -S             仅文件提取扫描
-  Frolaxity.py -f memory.img -cp            提取常用进程
-  Frolaxity.py -f memory.img -cd            提取常用地址
-  Frolaxity.py -f memory.img -S -V          仅执行插件命令
-  Frolaxity.py -f memory.img -U -V          仅进程提取扫描
-  Frolaxity.py -f memory.img -S -V          仅文件提取扫描
-  Frolaxity.py -f memory.img -cp -V         提取常用进程
-  Frolaxity.py -f memory.img -cd -V         提取常用地址
+  Frolaxity.py -f memory.img                全版本自动分析
+  Frolaxity.py -f memory.img -R             vol2提取隐藏进程
+  Frolaxity.py -f memory.img -C             vol2仅执行插件命令
+  Frolaxity.py -f memory.img -U             vol2仅进程提取扫描
+  Frolaxity.py -f memory.img -S             vol2仅文件提取扫描
+  Frolaxity.py -f memory.img -cp            vol2提取常用进程
+  Frolaxity.py -f memory.img -cd            vol2提取常用地址
+  Frolaxity.py -f memory.img -C -V          vol3仅执行插件命令
+  Frolaxity.py -f memory.img -U -V          vol3仅进程提取扫描
+  Frolaxity.py -f memory.img -S -V          vol3仅文件提取扫描
+  Frolaxity.py -f memory.img -cp -V         vol3提取常用进程
+  Frolaxity.py -f memory.img -cd -V         vol3提取常用地址
   Frolaxity.py -f memory.img -pr 镜像       指定内存镜像
-  Frolaxity.py -f memory.img -g			     默认正则扫描
+  Frolaxity.py -f memory.img -g			    默认正则扫描
   Frolaxity.py -f memory.img -g -D 目录     扫描指定目录
   Frolaxity.py -f memory.img -Y             YARA规则扫描
-  Frolaxity.py -f memory.img -p 1234 -pl    分析进程PoolTag
   Frolaxity.py -f memory.img -L             文件系统压缩包
+  Frolaxity.py -f memory.img -p 1234 -pl    分析进程PoolTag
   Frolaxity.py -f memory.img -p 1234        提取进程内存
   Frolaxity.py -f memory.img -Q 0x123456    提取指定文件
   Frolaxity.py -f memory.img -V             使用vol3版本
@@ -153,5 +152,6 @@ def _set_python_paths(self):
 ## 许可证
 
 MIT License
+
 
 
