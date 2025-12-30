@@ -1,2 +1,2 @@
 @echo off
-python.exe "%~dp0Frolaxity.py" %*
+python "%~dp0Frolaxity.py" %*
