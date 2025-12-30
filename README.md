@@ -65,12 +65,13 @@ options:
 ```bash
 使用示例:
   Frolaxity.py -f memory.img                全版本自动分析
-  Frolaxity.py -f memory.img -R             vol2提取隐藏进程
   Frolaxity.py -f memory.img -C             vol2仅执行插件命令
   Frolaxity.py -f memory.img -U             vol2仅进程提取扫描
   Frolaxity.py -f memory.img -S             vol2仅文件提取扫描
   Frolaxity.py -f memory.img -cp            vol2提取常用进程
   Frolaxity.py -f memory.img -cd            vol2提取常用地址
+  Frolaxity.py -f memory.img -R             vol2提取隐藏进程
+  Frolaxity.py -f memory.img -R -V          vol3提取隐藏进程
   Frolaxity.py -f memory.img -C -V          vol3仅执行插件命令
   Frolaxity.py -f memory.img -U -V          vol3仅进程提取扫描
   Frolaxity.py -f memory.img -S -V          vol3仅文件提取扫描
@@ -152,6 +153,7 @@ def _set_python_paths(self):
 ## 许可证
 
 MIT License
+
 
 
 
