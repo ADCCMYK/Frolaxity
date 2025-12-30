@@ -78,7 +78,7 @@ options:
   Frolaxity.py -f memory.img -cp -V         提取常用进程
   Frolaxity.py -f memory.img -cd -V         提取常用地址
   Frolaxity.py -f memory.img -pr 镜像       指定内存镜像
-  Frolaxity.py -f memory.img -g			   默认正则扫描
+  Frolaxity.py -f memory.img -g			     默认正则扫描
   Frolaxity.py -f memory.img -g -D 目录     扫描指定目录
   Frolaxity.py -f memory.img -Y             YARA规则扫描
   Frolaxity.py -f memory.img -p 1234 -pl    分析进程PoolTag
@@ -153,4 +153,5 @@ def _set_python_paths(self):
 ## 许可证
 
 MIT License
+
 
