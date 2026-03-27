@@ -8,7 +8,7 @@
 
 - Frolaxity 一个基于 Volatility CTF内存取证自动化工具  
   
-- 文件提取、进程提取没有多线程 标准插件执行线程默认数量10个
+- 文件提取、进程提取无多线程 标准插件执行线程默认数量10个
 
 - 插件配置 volplugins.py 配置文件 volconfig.py 正则配置 Folpattern.py   
 
