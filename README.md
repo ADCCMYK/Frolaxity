@@ -31,32 +31,31 @@
 
 ```bash
 options:
-  -h, --help            显示帮助信息
-  -f, --file FILE       内存镜像路径
-  -k, --quick-mode      快速分析模式
+  -h, --help                  显示帮助信息
+  -f, --file FILE             内存镜像路径
+  -k, --quick-mode            快速分析模式
   -e, --check_environment
-                        运行工具环境检查
-  -T, --Thread THREAD   插件执行线程数量
+                              运行工具环境检查
+  -T, --Thread THREAD         插件执行线程数量
   -D, --dump-dir DUMP_DIR
-                        指定文件目录
+                              指定文件目录
   -pr, --profile PROFILE
-                        指定内存镜像profile
-  -Q, --offset OFFSET   提取指定内存偏移地址
-  -P, --pid PID         提取指定进程PID
-  -C, --commands-only   仅执行插件命令
-  -S, --dump-files      仅执行文件扫描和提取
-  -U, --dump-process    仅执行进程扫描和提取
+                              指定内存镜像profile
+  -Q, --offset OFFSET         提取指定内存偏移地址
+  -P, --pid PID               提取指定进程PID
+  -C, --commands-only         仅执行插件命令
+  -S, --dump-files            仅执行文件扫描和提取
+  -U, --dump-process          仅执行进程扫描和提取
   -cp, --common-processes
-                        提取常用进程
+                              提取常用进程
   -cd, --common-address
-                        提取常用地址
-  -g, --pattern         使用默认正则扫描
-  -Y, --yara-scan       使用YARA规则扫描
-  -R, --hidden-process  分析隐藏进程
-  -L, --linux-pagecache
-                        文件系统压缩包
-  -pl, --pooltag        获取进程 PID PoolTag
-  -V, --vol3            使用Vol3版本
+                              提取常用地址
+  -g, --pattern               使用默认正则扫描
+  -Y, --yara-scan             使用YARA规则扫描
+  -R, --hidden-process        分析隐藏进程
+  -L, --linux-pagecache       文件系统压缩包
+  -pl, --pooltag              获取进程 PID PoolTag
+  -V, --vol3                  使用Vol3版本
 ```
 
 
