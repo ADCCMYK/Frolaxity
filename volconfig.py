@@ -7,12 +7,15 @@ import re
 import platform
 
 
+
+
 def _set_volatility(self):
         # vol环境配置(.py后缀会加上python环境配置路径)
         if platform.system() == 'Windows':
             return ['vol2', 'vol3']
         else:
             return ['vol2', 'vol3']
+
 
 
 
@@ -25,6 +28,7 @@ def _set_python_paths(self):
 
 
 
+
 def _set_volshows(self):
         # 命令行显示配置
         if platform.system() == 'Windows':
@@ -34,9 +38,240 @@ def _set_volshows(self):
 
 
 
+
+# 优先正则扫描目录
+def _get_priority_dirs(self):
+    # 获取优先扫描目录列表
+    return ['tree_report']
+
+
+
+
+# 正则扫描跳过的目录
+def _get_skipped_directories(self):
+    # 获取需要跳过的目录列表
+    return ['search_report', 'ctf_report']
+
+
+
+
+# 文件树扫描跳过的目录
+def _get_tree_skipped_directories(self):
+    # 获取文件树扫描中需要跳过的目录列表
+    return ['search_report', 'tree_report', 'extracted_files']
+
+
+
+
+# 解压缩扫描跳过的目录
+def _get_unzip_skipped_directories(self):
+    # 获取解压缩扫描中需要跳过的目录列表
+    return ['search_report', 'tree_report', 'extracted_files']
+
+
+
+
+# 默认目录名称列表
+def _get_default_directory_names(self):
+    return ['search_report', 'ctf_report', 'tree_report', 'extracted_files']
+
+
+
+
+# 默认目录前缀列表
+def _get_default_file_prefixes(self):
+    return ['common_addresses_', 'common_process_', 'dumps_', 'hidden_processes_']
+
+
+
+
+# 默认输出插件方法
+def _get_default_output_plugin(self):
+
+    return [ 
+        'mimikatz.txt', 'clipboard.txt', 'hashdump.txt', 'lsadump.txt', 'cachedump.txt', 'usbstor.txt', 
+        'bitlocker.txt', 'iehistory.txt', 'editbox.txt', 'cmdscan.txt','consoles.txt', 'cmdline.txt', 
+        'windows.cmdline.txt','mac.bash.Bash.txt', 'linux.lsof.Lsof.txt',
+        'firefoxhistory.txt', 'chromehistory.txt', 
+    ]
+
+
+
+
+# 优先匹配显示数量限制 0表示无上限
+def _get_priority_match_limit(self):
+    return 25
+
+
+
+
+# 其他匹配显示数量限制 0表示无上限
+def _get_other_match_limit(self):
+    return 5
+
+
+
+
+# 控制台输出上下文字符数限制 0表示无上限
+def _get_console_context_limit(self):
+    return 1000
+
+
+
+
+# 从扫描匹配结果中排除不需要显示内容
+def _scan_exclude_patterns(self):
+    """返回CTF扫描匹配中需要排除显示的模式列表"""
+    return [
+        r'(?i)\bFlags\b',
+        r'(?i)\bCtfImmNotify\b',
+        r'(?i)\bCtfImeConfigure\b',
+        r'(?i)\bCtfImmGetGuidAtom\b',
+        r'(?i)\bCtfImmTIMActivate\b',
+        r'(?i)\bCtfImmHideToolbarWnd\b',
+        r'(?i)\bCtfImeAssociateFocus\b',
+        r'(?i)\bCtfImeAssociateFocus\b',
+        r'(?i)\bCtfImmCoUninitialize\b',
+        r'(?i)\bCtfImmIsGuidMapEnable\b',
+        r'(?i)\bCtfImmGenerateMessage\b',
+        r'(?i)\bCtfImeDispatchDefImeMessage\b',
+        r'(?i)\bCtfImmSetCiceroStartInThread\b',
+        r'(?i)\bCtfImmLeaveCoInitCountSkipMode\b',
+        r'(?i)\bCtfImmEnterCoInitCountSkipMode\b',
+        r'(?i)\bCtfImmIsTextFrameServiceDisabled\b',
+        r'(?i)\bCtfImmSetDefaultRemoteKeyboardLayout\b',
+        ]
+
+
+
+
+# CTF扫描优先显示
+def _scan_priority_patterns(self):
+    """返回CTF扫描匹配中需要优先显示的模式列表"""
+    # 这些模式用于从已扫描匹配结果中筛选重要内容进行优先显示
+    return [
+            r'(?i)f+[1li!|]+[a4@]+[g9]+\{[^}]*(?:\})?',
+            r'(?i)f+[1li!|]+[a4@]+[g9]+[-\w]*(?:\.[^.\s]+)?',
+            r'(?i)f+[1li!|]+[a4@]+[g9]+(?:\d+)?\.[^.\s]+',
+            r'(?i)f+[1li!|]+[a4@]+[g9]+(?:\d+)?',
+            r'(?i)ctf\{[^}]*(?:\})?',
+            r'(?i)ctf[-\w]*(?:\.[^.\s]+)?',
+            r'(?i)h[1li!|]+[nm]+t[-\w]*(?:\.[^.\s]+)?',
+            r'(?i)h[1li!|]+[nm]+t(?:\d+)?',
+            r'(?i)s[5$s]+[e3]+[c\(]+[r2]+[e3]+t[-\w]*(?:\.[^.\s]+)?',
+            r'(?i)s[5$s]+[e3]+[c\(]+[r2]+[e3]+t(?:\d+)?',
+        ]
+
+
+
+
+
+# 重命名移动文件操作
+def _get_file_operation_timeout(self):
+    # 获取文件操作超时时间
+    return 60
+
+
+
+
+def _get_file_exts(self, plugins=""):
+    # 文件提取重命名移动后缀
+    if plugins in ['dumpfiles', '']:
+        file_exts = ['.dat', '.evtx', '.vacb', '.img']
+    else:
+    # 进程提取重命名移动后缀
+        file_exts = ['.dmp']
+    
+    return file_exts
+
+
+
+
 def _set_extract_files(self):
        # 默认解压配置
        return ['.dat', '.dat_old']
+
+
+
+
+# 支持压缩文件扩展名
+def _get_archive_extensions(self):
+    # 获取支持的压缩文件扩展名列表
+    return ['.zip', '.rar', '.7z', '.gz', '.gzip', '.bz2', '.xz', '.tar', '.tgz', '.tbz2', '.txz', '.dat', '.dat_old']
+
+
+
+
+def _is_text_file(self, file_path):
+    # 根据文件扩展名判断是否为文本文件
+    return file_path.lower().endswith((
+        '.txt', '.log', '.ini', '.conf', '.xml', '.md', '.evtx', 
+        '.json', '.yaml', '.yml', '.csv', '.html', '.htm', '.js', 
+        '.css', '.php', '.py', '.java', '.c', '.cpp', '.h', '.cs', 
+        '.go', '.rs', '.rb', '.pl', '.sh', '.bat', '.ps1', '.sql', 
+        '.css', '.js', '.py', '.c', '.cpp', '.h', '.java',
+        '.cfg', '.config', '.properties', '.env', '.gitignore', 
+        '.dockerignore', '.editorconfig', '.gitattributes',
+        '.gd','.tscn'
+    ))
+
+
+
+
+def _get_file_categories(self):
+    file_extensions = {
+        # 系统文件
+        'dll': ['.dll', '.drv', '.ocx', '.cpl'],
+        'evtx': ['.evtx', '.evt'],
+        'exe': ['.exe', '.com', '.bat', '.cmd', '.msi', '.msix', '.appx'],
+        
+        # 存储和镜像
+        'img': ['.img', '.iso', '.dmg', '.cue', '.nrg', '.mdf', '.mds', '.daa', '.uif', '.isz', '.cso', '.ecm'],
+        'virtualization': ['.vhd', '.vhdx', '.vmdk', '.vdi', '.qcow', '.qcow2', '.raw', '.vfd', '.vmem', '.vmsn', '.vmss', '.vmx', '.nvram', '.vbox', '.ova', '.ovf'],
+        
+        # 数据和数据库
+        'data': ['.dat', '.kdbx', '.psafe3', '.agilekeychain', '.opvault', '.sqlite', '.sqlite3', '.db', '.mdb', '.accdb', '.fdb', '.ldf', '.frm', '.myd', '.myi', '.ibd', '.dbf', '.sql'],
+        'blockchain': ['.block', '.wallet'],
+        
+        # 文档和办公
+        'document': ['.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.pdf', '.odt', '.ods', '.odp'],
+        'ebook': ['.epub', '.mobi', '.azw'],
+        'cad': ['.dwg', '.dxf', '.stl', '.obj'],
+        'gis': ['.shp', '.kml', '.kmz', '.geojson'],
+        'font': ['.ttf', '.otf', '.woff', '.woff2'],
+        
+        # 媒体文件
+        'image': ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.tiff', '.tif', '.ico'],
+        'video': ['.mp4', '.avi', '.mov', '.mkv', '.h264', '.wmv', '.flv', '.webm', '.m4v', '.mpg', '.mpeg', '.3gp', '.rmvb', '.vob', '.ts', '.m2ts', '.asf', '.divx', '.ogv', '.f4v'],
+        'audio': ['.mp3', '.wav', '.flac', '.ogg', '.mid', '.midi', '.au', '.aac', '.wma', '.m4a', '.opus', '.aif', '.aiff', '.amr', '.ape', '.ra', '.rm'],
+        
+        # 系统和技术文件
+        'process': ['.dmp', '.bin', '.core', '.crash', '.hprof', '.heapdump'],
+        'text': ['.txt', '.md', '.log', '.ini', '.conf', '.xml', '.out', '.err', '.syslog', '.event', '.audit', '.trace', '.debug'],
+        'config': ['.env', '.htaccess', '.config', '.yml', '.yaml', '.json', '.properties', '.cfg', '.inf', '.reg', '.policy'],
+        'certificate': ['.key', '.cert', '.crt', '.pem', '.der', '.pfx', '.p12', '.keystore', '.jks', '.truststore', '.bks', '.p7b', '.p7c', '.spc', '.cer', '.csr', '.crl', '.ocsp', '.asc', '.gpg', '.pgp', '.sig', '.signature'],
+        
+        # 代码和脚本
+        'source': ['.c', '.cpp', '.h', '.hpp', '.java', '.cs', '.go', '.rs', '.swift', '.kt', '.scala', '.m', '.mm'],
+        'script': ['.sh', '.bash', '.zsh', '.fish', '.ps1', '.vbs', '.py', '.rb', '.pl', '.lua', '.tcl'],
+        'web': ['.html', '.htm', '.css', '.ts', '.php', '.jsp', '.japx', '.jsx', '.tsx', '.vue', '.svelte', '.scss', '.less', '.sass'],
+        
+        # 压缩和归档
+        'software': ['.zip', '.rar', '.tar', '.7z', '.xz', '.zst', '.gz', '.bz2', '.lzh', '.arj', '.cab', '.deb', '.rpm', '.tar.gz', '.pkg', '.apk', '.ipa', '.par', '.par2', '.sfv', '.md5', '.sha1', '.sha256', '.sha512', '.crc', '.sfx', '.001', '.002', '.part', '.split', '.archive', '.backup', '.download', '.partial', '.crdownload', '.torrent', '.magnet', '.ed2k'],
+        
+        # 网络和通信
+        'network': ['.pcap', '.pcapng', '.cap', '.net', '.flow', '.tcpdump', '.saz', '.har', '.nfdump', '.nfcapd'],
+        'email': ['.pst', '.ost', '.eml', '.msg'],
+        
+        # 其他独特类别
+        'git': ['.git', '.gitignore', '.gitattributes', '.gitmodules', '.gitkeep'],
+        'container': ['.dockerfile'],
+        'backup': ['.bak', '.old', '.temp', '.tmp', '.swp', '.swo', '.php~', '.~'],
+        'unknown': []
+    }
+    
+    return file_extensions
+
 
 
 
@@ -46,6 +281,7 @@ def _create_output_dir(self):
             os.makedirs(self.output_dir)
             print(f"[*] 创建输出目录: {self.output_dir}")
         return True
+
 
 
 
@@ -59,6 +295,7 @@ def _systeminfo(self):
             self.system_type = "mac"
         else:
             self.system_type = "unknown"
+
 
 
 
@@ -77,6 +314,7 @@ def _get_vol3_plugin(self, plugin_name):
                 return "linux.elfs.Elfs"
         # 其他系统或未知插件保持原样
         return plugin_name
+
 
 
 
@@ -124,7 +362,8 @@ def _check_batch_termination(self, file_path):
         return False
     except Exception as e:
         print(f"[!] 检查文件 {file_path} 失败: {e}")
-        return False
+    return False
+
 
 
 

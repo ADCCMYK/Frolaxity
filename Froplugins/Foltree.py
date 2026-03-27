@@ -189,7 +189,7 @@ def write_tree_structure(f, file_list, get_encryption_func, archive_type):
                 f.write(f"{filename}{' ' * padding_length}[{encryption}]\n")
 
 
-def _analyze_archive_structure(self, directory_path, output_dir="tree_reports", max_depth=1000, parent_tree=None, parent_archive=None, is_top_level=True):
+def _analyze_archive_structure(self, directory_path, output_dir=None, max_depth=1000, parent_tree=None, parent_archive=None, is_top_level=True):
     """
     递归扫描目录并分析压缩包结构，生成详细报告
     
@@ -206,13 +206,18 @@ def _analyze_archive_structure(self, directory_path, output_dir="tree_reports", 
         print(f"[!] 达到最大递归{max_depth}深度，停止扫描: {directory_path}")
         return (parent_tree or [], parent_archive or [])
     
+    # 使用配置的目录名
+    if output_dir is None:
+        default_dirs = self.get_default_directory_names
+        output_dir = default_dirs[2] if len(default_dirs) > 2 else "tree_report"
+    
     # 只在第一次调用时构建完整路径，避免递归时重复拼接
     # 如果 output_dir 不是绝对路径，则将其构建在要扫描的目录下
     if is_top_level and not os.path.isabs(output_dir):
         output_dir = f"{directory_path}\\{output_dir}"
 
-    # 支持的压缩文件扩展名
-    archive_extensions = ['.zip', '.rar', '.7z', '.gz', '.gzip', '.bz2', '.xz', '.tar', '.tgz', '.tbz2', '.txz']
+    # 支持的压缩文件扩展名 - 从配置获取
+    archive_extensions = self.get_archive_extensions()
     
     # 生成报告文件名
     archive_name = os.path.basename(directory_path)
@@ -223,6 +228,11 @@ def _analyze_archive_structure(self, directory_path, output_dir="tree_reports", 
     # 记录目录结构的列表（使用传入的参数或创建新列表）
     directory_tree = parent_tree or []
     
+    # 检查目录是否存在
+    if not os.path.exists(directory_path):
+        print(f"[!] 指定的路径找不到目录: {directory_path}")
+        return (parent_tree or [], parent_archive or [])
+    
     # 如果是目录，递归扫描
     print(f"[*] 开始扫描目录: {directory_path}")
     for entry in os.listdir(directory_path):
@@ -231,9 +241,10 @@ def _analyze_archive_structure(self, directory_path, output_dir="tree_reports", 
         if not os.path.exists(full_path):
             continue
         
-        # 跳过特定目录
+        # 跳过特定目录 - 使用配置中的文件树跳过目录
         basename = os.path.basename(full_path)
-        if basename in ['search_report', 'tree_reports', 'extracted_files']:
+        skipped_dirs = self.get_tree_skipped_directories
+        if basename in skipped_dirs:
             continue
         
         # 记录目录结构信息

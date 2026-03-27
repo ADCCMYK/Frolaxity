@@ -54,16 +54,17 @@ def _rename_single_file(self, input_dir, dump_dir, clean_filename, file_exts):
         return None
 
     try:
-        # 假设最后一个文件是最新生成的（使用过滤后的文件列表）
+        # 假设最后一个文件是最新生成的
         latest_file = max([os.path.join(input_dir, f) for f in files], key=os.path.getctime)
         
-        # 检查文件创建时间是否在1分钟内
+        # 检查文件创建时间是否在超时时间
         current_time = time.time()
         file_creation_time = os.path.getctime(latest_file)
         time_diff = current_time - file_creation_time
+        timeout_seconds = self.get_file_operation_timeout()
         
-        if time_diff > 60:  # 1分钟
-            print(f"[!] 跳过文件 {os.path.basename(latest_file)}: 创建时间超过1分钟 ({int(time_diff)}秒)")
+        if time_diff > timeout_seconds:
+            print(f"[!] 跳过文件 {os.path.basename(latest_file)}: 创建时间超过{timeout_seconds}秒 ({int(time_diff)}秒)")
             return None
         
         # 构建目标文件名
@@ -150,14 +151,15 @@ def _rename_batch_files(self, input_dir, dump_dir, clean_filename, file_exts, ex
     processed_count = 0
     for filename in matched_files:
         try:
-            # 检查文件创建时间是否在1分钟内
+            # 检查文件创建时间是否在超时时间
             source_path = os.path.join(input_dir, filename)
             current_time = time.time()
             file_creation_time = os.path.getctime(source_path)
             time_diff = current_time - file_creation_time
+            timeout_seconds = self.get_file_operation_timeout()
             
-            if time_diff > 60:  # 1分钟
-                print(f"[!] 跳过文件 {filename}: 创建时间超过1分钟 ({int(time_diff)}秒)")
+            if time_diff > timeout_seconds:
+                print(f"[!] 跳过文件 {filename}: 创建时间超过{timeout_seconds}秒 ({int(time_diff)}秒)")
                 continue
             
             # 检测文件名格式

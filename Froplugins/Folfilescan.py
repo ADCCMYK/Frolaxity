@@ -7,12 +7,21 @@ import re
 from pathlib import Path
 
 
-def _dump_and_scan_files(self, vol_version=None, plugins="", common_address=False, scan_files=True):
+def _dump_and_scan_files(self, vol_version=None, plugins="", common_address=False, scan_files=True, quick_mode=False):
     
-    print(f"\n[*] 正在提取 {plugins}")
+    print(f"\n\n[*] 执行模式: {plugins}")
     print(f"[*] 使用版本: {vol_version}")
-
     
+    # 显示快速模式状态
+    if quick_mode:
+        print(f"[*] 快速模式 (精简文件/进程提取)")
+
+    # 初始化CTF匹配记录
+    if not hasattr(self, 'ctf_files_matches'):
+        self.ctf_files_matches = []  # 记录文件提取正则匹配
+    if not hasattr(self, 'ctf_process_matches'):
+        self.ctf_process_matches = []  # 记录进程提取正则匹配
+
     # 初始化 filescan_output 变量
     filescan_output = None
 
@@ -30,22 +39,55 @@ def _dump_and_scan_files(self, vol_version=None, plugins="", common_address=Fals
 
 
     # 文件提取重命名移动后缀
-    if plugins in ["dumpfiles", ""]:
-        file_exts = ['.dat', '.evtx', '.vacb', '.img']
-    else:
-    # 进程提取重命名移动后缀
-        file_exts = ['.dmp']
-
+    file_exts = self.get_file_exts(plugins)
     
-    # CTF正则优先匹配
-    ctf_regex = self.pattern
+    
+    # 不再预先创建所有分类目录，改为在确定文件类别时再创建
+    categories = self.get_file_categories
 
-    # 常用地址排除正则
-    exclude_patterns = self.exclude_patterns
 
-    # 常用正则表达式模式
-    common_address_patterns = self.common_address_patterns
-    common_process_patterns = self.common_process_patterns
+    # CTF正则优先匹配，根据插件类型选择不同的正则
+    ctf_regex = None
+    if plugins == "memdump":
+        ctf_regex = self.process_patterns
+
+    elif plugins == "dumpfiles":
+        ctf_regex = self.files_patterns
+
+
+    # 根据快速模式选择使用的正则模式
+    if quick_mode:
+        # 快速模式下使用精简正则
+        if plugins == "dumpfiles":
+            # 文件提取使用快速文件正则
+            address_patterns = self.quick_files_patterns
+        elif plugins == "memdump":
+            # 进程提取使用快速进程正则
+            address_patterns = self.quick_process_patterns
+        else:
+            address_patterns = []
+    else:
+        # 普通模式下使用原来的常用正则
+        if plugins == "dumpfiles":
+            address_patterns = self.common_address_patterns
+        elif plugins == "memdump":
+            address_patterns = self.common_process_patterns
+        else:
+            address_patterns = []
+
+
+    # 根据快速模式选择使用的排除正则
+    if quick_mode:
+        # 快速模式下使用快速排除正则
+        exclude_patterns = self.quick_exclude_patterns
+    else:
+        # 普通模式下使用原来的排除正则
+        exclude_patterns = self.exclude_patterns
+
+
+    # 保留原来的变量名以保持兼容性
+    common_address_patterns = address_patterns
+    common_process_patterns = address_patterns
 
 
     # 常用地址提取模式使用新的输出目录
@@ -85,38 +127,13 @@ def _dump_and_scan_files(self, vol_version=None, plugins="", common_address=Fals
         if os.path.exists(file_path):
             try:
                 with open(file_path, 'w') as f:
-                    f.write('')  # 清空文件内容
+                    f.write('')
                 print(f"[+] 已清空文件以防止重复: {file_path}")
             except Exception as e:
                 print(f"[!] 清空文件失败: {file_path}, 错误: {e}")
 
 
-    
-    # 不再预先创建所有分类目录，改为在确定文件类别时再创建
-    categories = {
-        'dll': ['.dll'], 
-        'evtx': ['.evtx'],
-        'exe': ['.exe'],
-        'img': ['.img', '.iso'], 
-        'process': ['.dmp', '.bin'], 
-        'text': ['.txt', '.md', '.log', '.ini', '.conf', '.xml', '.out', '.err', '.syslog', '.event', '.audit', '.trace', '.debug'],
-        'data': ['.dat','.kdbx', '.psafe3', '.agilekeychain', '.opvault', '.sqlite', '.sqlite3', '.db', '.mdb', '.accdb', '.fdb', '.mdf', '.ldf', '.frm', '.myd', '.myi', '.ibd', '.dbf', '.sql', '.sqlite3'],
-        'image': ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.tiff', '.tif', '.ico'],
-        'video': ['.mp4', '.avi', '.mov', '.mkv', '.h264'],
-        'audio': ['.mp3', '.wav', '.flac', '.ogg', '.mid', '.midi', '.au'],
-        'software': ['.zip', '.rar', '.tar', '.7z', '.xz', '.zst', '.gz', '.bz2', '.lzh', '.arj', '.cab', '.deb', '.rpm', '.tar.gz', '.msi', '.dmg', '.pkg', '.apk', '.ipa', '.cue', '.nrg', '.mdf', '.mds', '.daa', '.uif', '.isz', '.cso', '.ecm', '.par', '.par2', '.sfv', '.md5', '.sha1', '.sha256', '.sha512', '.crc', '.sfx', '.001', '.002', '.part', '.split', '.archive', '.backup', '.download', '.partial', '.crdownload', '.torrent', '.magnet', '.ed2k'],
-        'document': ['.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.rtf', '.pdf'],
-        'network': ['.pcap', '.pcapng'],
-        'config': ['.env', '.htaccess', '.config', '.yml', '.yaml', '.json', '.properties', '.cfg', '.inf', '.ini', '.reg', '.policy'],
-        'certificate': ['.key', '.cert', '.crt', '.pem', '.der', '.pfx', '.p12', '.keystore', '.jks', '.truststore', '.bks', '.p7b', '.p7c', '.spc', '.cer', '.csr', '.crl', '.ocsp', '.asc', '.gpg', '.pgp', '.sig', '.signature'],
-        'script': ['.sh', '.bash', '.zsh', '.fish', '.ps1', '.bat', '.cmd', '.vbs', '.js', '.py', '.rb', '.pl', '.lua', '.tcl'],
-        'source': ['.c', '.cpp', '.h', '.hpp', '.java', '.cs', '.go', '.rs', '.swift', '.kt', '.scala', '.m', '.mm'],
-        'web': ['.html', '.htm', '.css', '.js', '.ts', '.php', '.jsp', '.japx', '.jsx', '.tsx', '.vue', '.svelte', '.scss', '.less', '.sass'],
-        'backup': ['.bak', '.old', '.temp', '.tmp', '.swp', '.swo', '.php~', '.~'],
-        'virtualization': ['.vhd', '.vhdx', '.vmdk', '.vdi', '.qcow', '.qcow2', '.raw', '.vfd', '.vmem', '.vmsn', '.vmss', '.vmx', '.nvram', '.vbox'],
-        'unknown': []
-    }
-    
+        
     
     # 处理进程转储模式
     if plugins == "memdump":
@@ -252,6 +269,12 @@ def _dump_and_scan_files(self, vol_version=None, plugins="", common_address=Fals
             # 使用集合来跟踪已处理的PID，实现去重
             seen_pids = set()
             
+            # 排除匹配打印标志，初始为False
+            exclude_print_prefix = False
+            
+            # 进程跳过打印标志，初始为False
+            process_skip_prefix = False
+            
             for line in f:
                 if not line.strip() or line.startswith(('Volatility', '#')):
                     continue
@@ -309,7 +332,11 @@ def _dump_and_scan_files(self, vol_version=None, plugins="", common_address=Fals
                     if pid and pid.isdigit():
                         # 检查是否已经处理过这个PID，避免重复提取
                         if pid in seen_pids:
-                            print(f"[-] 跳过重复进程: PID={pid}, Name={process_name}")
+                            if process_skip_prefix:
+                                print(f"[-] 跳过重复进程: PID={pid}, Name={process_name}")
+                            else:
+                                print(f"\n\n[-] 跳过重复进程: PID={pid}, Name={process_name}")
+                                process_skip_prefix = True
                             continue
                         
                         # 只有在常用地址模式下才需要检查进程匹配
@@ -335,16 +362,31 @@ def _dump_and_scan_files(self, vol_version=None, plugins="", common_address=Fals
                                             break
                                 
                                 if not is_common_process:
-                                    print(f"[-] 跳过非常用进程: PID={pid}, Name={process_name}")
+                                    if process_skip_prefix:
+                                        print(f"[-] 跳过非常用进程: PID={pid}, Name={process_name}")
+                                    else:
+                                        print(f"\n\n[-] 跳过非常用进程: PID={pid}, Name={process_name}")
+                                        process_skip_prefix = True
                                     continue
                             
                             seen_pids.add(pid)
                             dump_dir = f"{base_dump_dir}/process"
                             output_file = f"{pid}_{process_name}.dmp"
                             if ctf_matched:
-                                print(f"\n[+++] 提取CTF进程: PID={pid}, Name={process_name}")
+                                print(f"\n\n[+++] 提取CTF进程: PID={pid}, Name={process_name}")
+                                # 重置进程跳过打印标志
+                                process_skip_prefix = False
+                                # 记录CTF进程提取正则匹配
+                                actual_path = os.path.join(dump_dir, output_file)
+                                self.record_ctf_process_match(f"PID={pid}, Name={process_name}", actual_path, pid, process_name, vol_version=vol_version)
                             else:
-                                print(f"\n[+] 提取常用进程: PID={pid}, Name={process_name}  {matched_pattern}")
+                                if not quick_mode:
+                                    print(f"\n\n[+] 提取常用进程: PID={pid}, Name={process_name}  {matched_pattern}")
+                                else:
+                                    print(f"\n\n[+] 提取快速进程: PID={pid}, Name={process_name}  {matched_pattern}")
+
+                                # 重置进程跳过打印标志
+                                process_skip_prefix = False
                         else:
                             # 非常用地址模式，提取所有进程
                             seen_pids.add(pid)
@@ -370,13 +412,18 @@ def _dump_and_scan_files(self, vol_version=None, plugins="", common_address=Fals
                                 dump_dir=dump_dir,
                                 clean_filename=output_file,
                                 file_exts=file_exts,
-                                expected_offset=pid  # 对于进程转储，使用PID作为期望的偏移量
+                                expected_offset=pid
                             )
                         else:
                             # 使用重命名方法（单个文件）
                             self.rename_single_file(input_dir=input_dir if vol_version == "vol3" else dump_dir, dump_dir=dump_dir, clean_filename=output_file, file_exts=file_exts)
 
                 else:  # dumpfiles模式
+                    # 初始化变量（确保在所有情况下都定义）
+                    ctf_matched = False
+                    match_found = False
+                    matched_pattern = None
+                    
                     # 跳过filescan的表头和分隔线
                     if line.startswith(('Offset(P)', '------------------')):
                         continue
@@ -434,17 +481,25 @@ def _dump_and_scan_files(self, vol_version=None, plugins="", common_address=Fals
                                 # 提取匹配的路径部分用于显示
                                 path_match = re.search(r'[a-zA-Z]:\\.*|/.*|\\\\Device\\\\.*', line)
                                 matched_path = path_match.group(0) if path_match else line.strip()
-                                print(f"\n[+++] CTF匹配 '{ctf_regex}' -> {matched_path}")
+                                print(f"\n\n[+++] CTF匹配 '{ctf_regex}' -> {matched_path}")
+                                
+                                # 重置排除匹配打印标志
+                                exclude_print_prefix = False
+                                    
                         
                         # 如果CTF匹配，跳过排除和常用地址检查
                         if not ctf_matched:
-                            # 排除匹配检查：如果匹配到排除模式，跳过该行
+                            # 排除匹配检查：如果匹配排除模式，跳过该行
                             excluded = False
                             if exclude_patterns:
                                 for exclude_pattern in exclude_patterns:
                                     if re.search(exclude_pattern, line):
-                                        # 匹配到排除模式，输出信息并跳过
-                                        print(f"[-] 排除匹配 '{exclude_pattern}' -> {line.strip()}")
+                                        # 匹配排除模式，输出信息并跳过
+                                        if exclude_print_prefix:
+                                            print(f"[-] 排除匹配 '{exclude_pattern}' -> {line.strip()}")
+                                        else:
+                                            print(f"\n\n[-] 排除匹配 '{exclude_pattern}' -> {line.strip()}")
+                                            exclude_print_prefix = True
                                         excluded = True
                                         break
                             
@@ -468,9 +523,15 @@ def _dump_and_scan_files(self, vol_version=None, plugins="", common_address=Fals
                                 # 匹配Windows驱动器路径 (C:\...), Linux路径 (/...), 或设备路径 (\Device\...)
                                 path_match = re.search(r'[a-zA-Z]:\\.*|/.*|\\\\Device\\\\.*', line)
                                 matched_path = path_match.group(0) if path_match else line.strip()
-                                print(f"\n[+] 匹配到常用地址规则 '{matched_pattern}' -> {matched_path}")
+                                if not quick_mode:
+                                    print(f"\n\n[+] 匹配常用地址规则 '{matched_pattern}' -> {matched_path}")
+                                else:
+                                    print(f"\n\n[+] 匹配快速地址规则 '{matched_pattern}' -> {matched_path}")
+
+                                # 重置排除匹配打印标志
+                                exclude_print_prefix = False
                             else:
-                                # 如果不匹配任何常用地址模式，跳过提取
+                                # 如果不匹配任何常用地址模式跳过提取
                                 continue
 
                     # 只有在common_address模式下才需要检查匹配
@@ -478,7 +539,7 @@ def _dump_and_scan_files(self, vol_version=None, plugins="", common_address=Fals
                         # 提取路径用于显示错误信息
                         path_match = re.search(r'[a-zA-Z]:\\.*|/.*|\\\\Device\\\\.*', line)
                         display_path = path_match.group(0) if path_match else line.strip()
-                        print(f"[!] {display_path} 没有匹配到任何常用地址规则")
+                        print(f"\n[!] {display_path} 没有匹配任何常用地址规则")
                         continue
                     
                     file_ext = os.path.splitext(filename)[1].lower()
@@ -498,11 +559,22 @@ def _dump_and_scan_files(self, vol_version=None, plugins="", common_address=Fals
                     # 如果无法识别文件类别，归类到unknown目录
                     if file_category is None:
                         file_category = 'unknown'
-                    
-                    dump_dir = f"{base_dump_dir}/{file_category}"
+
                     # 只在确定文件类别时才创建对应的目录
+                    dump_dir = f"{base_dump_dir}/{file_category}"
                     Path(dump_dir).mkdir(parents=True, exist_ok=True)
                     clean_filename = f"{offset}_{os.path.basename(filename.replace('\\', '/'))}"
+                    
+                    # 显示提取文件路径（不在常用地址模式显示）
+                    if not common_address:
+                        actual_path = os.path.join(dump_dir, clean_filename)
+                        print(f"\n\n[*] 提取文件: {offset} -> {actual_path}")
+                    
+                    # 记录CTF匹配（在文件提取之前，确保使用正确的变量）
+                    if ctf_matched and plugins == "dumpfiles":
+                        actual_path = os.path.join(dump_dir, clean_filename)
+                        self.record_ctf_files_match(line.strip(), actual_path, offset, vol_version=vol_version)
+                    
                     self.run_command(
                         plugin=plugins,
                         offset=offset,
@@ -517,7 +589,7 @@ def _dump_and_scan_files(self, vol_version=None, plugins="", common_address=Fals
                         clean_filename=clean_filename, 
                         file_exts=file_exts,
                         expected_offset=offset
-                        )
+                    )
     
 
     except FileNotFoundError:
@@ -532,6 +604,12 @@ def _dump_and_scan_files(self, vol_version=None, plugins="", common_address=Fals
             for file in files:
                 file_path = os.path.join(root, file)
                 self.scan_for_flags(file_path)
-                
-                
+    
+    
+
+    # 生成CTF匹配报告文件（即使没有匹配记录也生成空文件）
+    self.generate_ctf_files_report(vol_version=vol_version)
+
+    self.generate_ctf_process_report(vol_version=vol_version)
+        
     return True

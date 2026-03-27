@@ -174,7 +174,7 @@ def _safe_extract_rar(rar_ref, extract_dir):
 
 
 
-def _search_and_extract_dat_files(self, directory_path, extensions=None, extract_dir="extracted_files"):
+def _search_and_extract_dat_files(self, directory_path, extensions=None, extract_dir=None):
     """
     递归搜索目录中的所有指定后缀文件并尝试多种解压方法
     
@@ -184,13 +184,27 @@ def _search_and_extract_dat_files(self, directory_path, extensions=None, extract
         extract_dir: 解压文件的目录命名
     """
     
+    # 使用配置的默认目录名
+    if extract_dir is None:
+        default_dirs = self.get_default_directory_names
+        extract_dir = default_dirs[3] if len(default_dirs) > 3 else "extracted_files"
+    
     # 只在第一次调用时构建完整路径，避免递归时重复拼接
     if not extract_dir.startswith(self.output_dir):
         extract_dir = f"{self.output_dir}\\{extract_dir}"
         
-    # 设置默认后缀
+    # 使用配置的提取文件后缀作为白名单
+    whitelist = self.set_extract_files()
+    
+    # 处理扩展名参数：如果为None则使用白名单，否则过滤只保留白名单中的类型
     if extensions is None:
-        extensions = self.set_extract_files()
+        extensions = whitelist
+    else:
+        # 过滤只保留白名单中的扩展名
+        extensions = [ext for ext in extensions if ext in whitelist]
+        if not extensions:
+            print(f"[!] 指定的扩展名不在白名单跳过解压操作")
+            return True
     
     
     # 检查路径是否存在
@@ -202,7 +216,9 @@ def _search_and_extract_dat_files(self, directory_path, extensions=None, extract
     if os.path.isdir(directory_path):
         basename = os.path.basename(directory_path)
         
-        if basename in ['search_report', 'tree_reports', 'extracted_files']:
+        # 使用volconfig.py中的配置跳过特定目录
+        skipped_dirs = self.get_unzip_skipped_directories
+        if basename in skipped_dirs:
             return False
         
         print(f"[*] 扫描目录: {directory_path}")

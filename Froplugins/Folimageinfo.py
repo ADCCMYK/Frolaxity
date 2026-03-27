@@ -20,7 +20,7 @@ def _imageinfo(self):
     linux_banners_path = f"{self.output_dir}/linux.banners.txt"
     mac_bash_path = f"{self.output_dir}/mac_bash.txt"
 
-    # 1. 首先尝试从缓存文件读取
+    # 尝试从缓存文件读取
     cache_files = [
         (imageinfo_path, "Suggested Profile(s)", r"Suggested Profile\(s\) : (.*?)\n", "Volatility 2"),
         (windows_info_path, "NtProductType", None, "Volatility 3 Windows"),
@@ -76,7 +76,7 @@ def _imageinfo(self):
         except:
             continue
 
-    # 2. 优先尝试Volatility 3的windows.info
+    # 尝试Volatility 3的windows.info
     if self.vol3_available:
         print(f"[*] 尝试Volatility 3 windows.info检测Windows系统...")
         try:
@@ -100,7 +100,7 @@ def _imageinfo(self):
         except Exception as e:
             print(f"[!] Volatility 3检测失败: {str(e)}")
 
-    # 3. 尝试Volatility 3的banners.Banners
+    # 尝试Volatility 3的banners.Banners
     if self.vol3_available:
         print(f"[*] 尝试Volatility 3 banners.Banners检测Linux系统...")
         try:
@@ -131,7 +131,7 @@ def _imageinfo(self):
         except Exception as e:
             print(f"[!] banners.Banners检测失败: {str(e)}")
 
-    # 4. 尝试Volatility 3的mac.bash.Bash
+    # 尝试Volatility 3的mac.bash.Bash
     if self.vol3_available:
         print(f"[*] 尝试Volatility 3 mac.bash.Bash检测Mac系统...")
         try:
@@ -156,7 +156,7 @@ def _imageinfo(self):
         except Exception as e:
             print(f"[!] mac.bash.Bash检测失败: {str(e)}")
 
-    # 5. 最后尝试Volatility 2的imageinfo
+    # 尝试Volatility 2的imageinfo
     print(f"[*] 最后尝试Volatility 2 imageinfo...")
     try:
         cmd = f"{self.vol2_path} -f {self.mem_file} imageinfo"
@@ -183,7 +183,7 @@ def _imageinfo(self):
     except Exception as e:
         print(f"[!] Volatility 2检测失败: {str(e)}")
 
-    # 6. 所有检测都失败
+    # 所有检测都失败
     print("[!] 无法确定内存镜像类型，可能符号表有问题")
     print("[!] 请手动指定--profile参数或检查内存文件完整性")
     print("[!] 将使用通用插件进行分析")

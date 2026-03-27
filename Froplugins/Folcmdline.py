@@ -13,6 +13,11 @@ def _run_command(self, plugin, params="", output_file=None, pid=None, offset=Non
                 raise ValueError("无法自动检测内存镜像profile")
 
 
+        # 创建screenshot目录
+        if "screenshot" in plugin:
+             os.makedirs(f"{self.output_dir}/screenshots/", exist_ok=True)
+
+
         # 选择Volatility版本
         if vol_version == "vol3":
 
@@ -27,6 +32,10 @@ def _run_command(self, plugin, params="", output_file=None, pid=None, offset=Non
             # 构建基础命令（Volatility 3格式）
             cmd = f" -f {self.mem_file} {plugin}"
             
+            # 添加插件参数
+            if params:
+                cmd += f" {params}"
+            
             # 添加PID参数（Volatility 3使用--pid）
             if pid:
                 cmd += f" --pid {pid}"
@@ -36,7 +45,7 @@ def _run_command(self, plugin, params="", output_file=None, pid=None, offset=Non
                 if 'linux.pagecache.InodePages' in plugin:
                     cmd += f" --inode {offset}"
                 elif 'linux.pagecache.RecoverFs' in plugin:
-                    cmd += f'--compression-format gz'
+                    cmd += f' --compression-format gz'
                 else:
                     cmd += f" --physaddr {offset}"
                 
@@ -67,10 +76,11 @@ def _run_command(self, plugin, params="", output_file=None, pid=None, offset=Non
             # 添加dump目录参数（Volatility 2使用-D）
             if dump_dir:
                 cmd += f" -D {dump_dir}"
-            
+                
             # 添加其他参数
             cmd += f" {params}"
 
+        # 生成结果文件
         output_file = output_file or f"{self.output_dir}/{plugin}.txt"
 
         # 美化命令显示
@@ -110,12 +120,10 @@ def _run_command(self, plugin, params="", output_file=None, pid=None, offset=Non
                     return symbol_download_result
                 else:
                     # 对于非符号下载的情况，需要同时处理stdout和stderr
-                    # 由于stdout已经重定向到文件，我们只需要处理stderr
                     while True:
                         stderr_line = process.stderr.readline()
                         if not stderr_line and process.poll() is not None:
                             break
-                        # 可以在这里处理stderr输出，如果需要的话
                 
             print(f"[+] {plugin} 执行完成 -> {output_file}")
             return True

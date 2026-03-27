@@ -128,6 +128,7 @@ def _extract_hidden_processes(self, vol_version=None):
                 
                 if pid:
                     all_pids.add(pid)
+
     except FileNotFoundError:
         print(f"[!] 文件不存在: {psxview_output}")
         return False
@@ -167,26 +168,28 @@ def _extract_hidden_processes(self, vol_version=None):
         except FileNotFoundError:
             print(f"[!] 文件不存在: {pidhashtable_output}")
     
-    # 找出隐藏进程（在所有进程中但不在可见进程中的PID）
+    # 找出隐藏进程
     hidden_pids = all_pids - visible_pids
     
     if not hidden_pids:
         print("[!] 未发现隐藏进程")
         return False
     
-    print(f"[!] 发现 {len(hidden_pids)} 个隐藏进程: {list(hidden_pids)}")
+    
+    print(f"[*] 发现 {len(hidden_pids)} 个隐藏进程: {list(hidden_pids)}")
 
-    # 创建隐藏进程输出目录（修正版本判断逻辑）
-    if vol_version == "vol3":
-        hidden_dir = f"{self.output_dir}/hidden_processes_vol3"
-    else:
-        hidden_dir = f"{self.output_dir}/hidden_processes_vol2"
+    prefix = "vol3" if vol_version == "vol3" else "vol2"
+    
+    # 获取默认文件前缀列表（隐藏进程前缀）
+    file_prefixes = self.get_default_file_prefixes
+    hidden_prefix = file_prefixes[3] if len(file_prefixes) > 3 else "hidden_processes_"
+        
+    hidden_dir = f"{self.output_dir}/{hidden_prefix}{prefix}"
     
     Path(hidden_dir).mkdir(exist_ok=True)
     
     # 提取隐藏进程内存
     for pid in hidden_pids:
-        dump_file = f"{hidden_dir}/hidden_{self.system_type}_{pid}.dmp"
         self.run_command(
             memdump_plugin,
             pid=pid,
