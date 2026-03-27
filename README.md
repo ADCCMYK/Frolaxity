@@ -64,28 +64,28 @@ options:
 ## 使用说明
 
 ```bash
-  Frolaxity.py -f memory.img                自动扫描分析
-  Frolaxity.py -f memory.img -k             快速分析模式
-  Frolaxity.py -f memory.img -C             执行插件命令
-  Frolaxity.py -f memory.img -U             vol2进程提取扫描
-  Frolaxity.py -f memory.img -S             vol2文件提取扫描
-  Frolaxity.py -f memory.img -cp            vol2提取常用进程
-  Frolaxity.py -f memory.img -cd            vol2提取常用地址
-  Frolaxity.py -f memory.img -R             vol2提取隐藏进程
-  Frolaxity.py -f memory.img -R -V          vol3提取隐藏进程
-  Frolaxity.py -f memory.img -U -V          vol3进程提取扫描
-  Frolaxity.py -f memory.img -S -V          vol3文件提取扫描
-  Frolaxity.py -f memory.img -cp -V         vol3提取常用进程
-  Frolaxity.py -f memory.img -cd -V         vol3提取常用地址
-  Frolaxity.py -f memory.img -pr Win7SP1x64 指定内存镜像
-  Frolaxity.py -f memory.img -g             默认正则扫描
-  Frolaxity.py -f memory.img -g -D Path     扫描指定目录
-  Frolaxity.py -f memory.img -Y             YARA规则扫描
-  Frolaxity.py -f memory.img -L             文件系统压缩包
-  Frolaxity.py -f memory.img -p 1234 -pl    分析进程PoolTag
-  Frolaxity.py -f memory.img -p 1234        提取进程内存
-  Frolaxity.py -f memory.img -Q 0x123456    提取指定文件
-  Frolaxity.py -f memory.img -V             使用vol3版本
+  Frolaxity.py -f memory.img                   自动扫描分析
+  Frolaxity.py -f memory.img -k                快速分析模式
+  Frolaxity.py -f memory.img -C                执行插件命令
+  Frolaxity.py -f memory.img -U                vol2进程提取扫描
+  Frolaxity.py -f memory.img -S                vol2文件提取扫描
+  Frolaxity.py -f memory.img -cp               vol2提取常用进程
+  Frolaxity.py -f memory.img -cd               vol2提取常用地址
+  Frolaxity.py -f memory.img -R                vol2提取隐藏进程
+  Frolaxity.py -f memory.img -R -V             vol3提取隐藏进程
+  Frolaxity.py -f memory.img -U -V             vol3进程提取扫描
+  Frolaxity.py -f memory.img -S -V             vol3文件提取扫描
+  Frolaxity.py -f memory.img -cp -V            vol3提取常用进程
+  Frolaxity.py -f memory.img -cd -V            vol3提取常用地址
+  Frolaxity.py -f memory.img -pr Win7SP1x64    指定内存镜像
+  Frolaxity.py -f memory.img -g                默认正则扫描
+  Frolaxity.py -f memory.img -g -D Path        扫描指定目录
+  Frolaxity.py -f memory.img -Y                YARA规则扫描
+  Frolaxity.py -f memory.img -L                文件系统压缩包
+  Frolaxity.py -f memory.img -p 1234 -pl       分析进程PoolTag
+  Frolaxity.py -f memory.img -p 1234           提取进程内存
+  Frolaxity.py -f memory.img -Q 0x123456       提取指定文件
+  Frolaxity.py -f memory.img -V                使用vol3版本
 ```
 
 
