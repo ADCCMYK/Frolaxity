@@ -125,6 +125,8 @@ def _scan_exclude_patterns(self):
     return [
         r'(?i)\bFlags\b',
         r'(?i)\bCtfImmNotify\b',
+        r'(?i)\bCtfImeSetFocus\b',
+        r'(?i)\bCtfImeSetFocus\b',
         r'(?i)\bCtfImeConfigure\b',
         r'(?i)\bCtfImmGetGuidAtom\b',
         r'(?i)\bCtfImmTIMActivate\b',
@@ -133,6 +135,7 @@ def _scan_exclude_patterns(self):
         r'(?i)\bCtfImeAssociateFocus\b',
         r'(?i)\bCtfImmCoUninitialize\b',
         r'(?i)\bCtfImmIsGuidMapEnable\b',
+        r'(?i)\bCtfImmIsCiceroEnabled\b',
         r'(?i)\bCtfImmGenerateMessage\b',
         r'(?i)\bCtfImeDispatchDefImeMessage\b',
         r'(?i)\bCtfImmSetCiceroStartInThread\b',
